@@ -113,7 +113,9 @@
 		 function check(){
 		 	if(((timer.diffMins==0)&&(timer.diffSec==0)&&(timer.diffDays==0)&&(timer.diffHrs==0)&&(timer.diffmSec==0))) {
 		        	clearInterval(q);
-		        	alert("The EVENT has started !!!");
+		        	alert("The time is up !!!");
+		        	getId("start1").disabled = false ;
+
 		        }
 		 }	
 
