@@ -1,0 +1,172 @@
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>Hacker Mode -1</title>
+	<link type="text/css" href="hackerStyle.css" rel="stylesheet">		
+</head>
+<body>
+	<div id="hd">
+	   <h1>The TIMER</h1>
+    </div>
+   
+	<div id="container">
+		<div id="timer">
+             <div class="clock" id="days"> </div>
+             <div class="clock" id="hours"> </div>
+             <div class="clock" id="mins"> </div>
+             <div class="clock" id="secs"> </div>
+             <div class="clock" id="msec"> </div>
+             <div id="dispText1">
+ 			  	<div id="dD">Days</div>
+ 				<div id="dH"> Hours</div>
+ 				<div id="dM"> Minutes</div>
+ 				<div id="dS"> Seconds</div>
+ 				<div id="dmS">mSeconds</div>
+ 			</div>
+		</div>	
+
+		<div id="inputBox">
+			<div id="d"><input type="number" id="day"  max="999" min="0" value ="0"></div>
+			<div id="h"><input type="number" id="hour" max="23" min="0" value="0"></div>
+			<div id="m"><input type="number" id="min"  max="59" min="0" value="0"></div>
+			<div id="s"><input type="number" id="sec"  max="59" min="0" value="0"></div><br>              
+ 		</div>
+ 		<div id="dispText2">
+ 			<div id="dtD">Days</div>
+ 			<div id="dtH"> Hours</div>
+ 			<div id="dtM"> Minutes</div>
+ 			<div id="dtS"> Seconds</div>
+ 		</div>
+
+ 		<div id="buttons">
+ 			<button class="b" id="start1" onclick="start()">Start</button>
+ 			<button class="b" id="pause1" onclick="pause()">Pause</button>
+ 			<button class="b" id="reset1" onclick="reset()">Reset</button>
+ 			<button class="b" id="refresh1" onclick="refresh()">Refresh</button>
+ 		</div>
+	</div>
+
+	<script type="text/javascript">
+
+		function getId(id){
+			return document.getElementById(id);
+		 }
+
+		var clock = { diffHrs:0 , diffMins:0 , diffDays:0 , diffSec:0 ,diffmSec:0 ,  
+		   	addEvent : function(d,h,m,s,ms){
+		   		this.diffDays = d;
+		   		this.diffHrs  = h;
+		   		this.diffSec  = s;
+		   		this.diffMins = m;
+		   		this.diffmSec = ms;
+		   	} ,
+
+		    refreshTime: function(){
+
+			    if(this.diffmSec<0){
+			    	this.diffmSec+=1000;
+			    	this.diffSec--;		   
+				   if(this.diffSec<0){
+				   	 this.diffMins -- ;
+				   	 this.diffSec+=60;
+				   	 if(this.diffMins<0){
+				   	 	this.diffHrs--;
+				   	 	this.diffMins=59;
+				   	 	if(this.diffHrs<0){
+				   	 		this.diffDays--;
+				   	 		this.diffHrs+=24;
+				   	 	}
+				   	 } 
+				   }  
+		         }
+		       }
+	 };        
+
+	 var timer ,q ,w;
+	 var sDays , sHrs , sMins , sSecs,smSec=0 ,c=false ,pmSec=0;
+	 timer = Object.create(clock);
+	 
+		 function addValue(){
+		 	sDays = getId("day").value;
+		 	sHrs  = getId("hour").value;
+		 	sMins = getId("min").value;
+		 	sSecs = getId("sec").value;
+		 	smSec = pmSec ; 
+		 }
+
+		 function updateVal(){
+		 	sDays=timer.diffDays;
+		 	sHrs =timer.diffHrs;
+		 	sMins=timer.diffMins;
+		 	sSecs=timer.diffSec;
+		 	smSec=timer.diffmSec;		 	
+		 }
+
+		 function show() {
+		 	getId("days").innerHTML=timer.diffDays;
+		 	getId("hours").innerHTML=timer.diffHrs;
+		 	getId("mins").innerHTML=timer.diffMins;
+		 	getId("secs").innerHTML=timer.diffSec; 
+		 	getId("msec").innerHTML=timer.diffmSec;	
+		 }
+
+		 function check(){
+		 	if(((timer.diffMins==0)&&(timer.diffSec==0)&&(timer.diffDays==0)&&(timer.diffHrs==0)&&(timer.diffmSec==0))) {
+		        	clearInterval(q);
+		        	alert("The EVENT has started !!!");
+		        }
+		 }	
+
+		 function changeVal(dd,hh,mm,ss,sss){
+		 	getId("day").value =dd;
+			getId("hour").value=hh;
+			getId("min").value =mm;
+			getId("sec").value =ss;
+		 }
+
+		function start(){
+			addValue();
+			show();
+			if(c==false)
+		        timer.addEvent(sDays,sHrs,sMins,sSecs,smSec);
+		    else{
+		    	timer.addEvent(timer.diffDays,timer.diffHrs,timer.diffMins,timer.diffSec,timer.diffmSec);
+		    	updateVal();
+		    	c=false;
+		    }
+		    getId("start1").disabled = true ;
+
+		    q = setInterval(function(){  
+		        show(); 	
+		    	check();
+		    	show();
+			    timer.diffmSec-=10;
+			    timer.refreshTime();		
+		    },10);
+		}
+		
+		function pause(){   
+			clearInterval(q);
+			getId("start1").disabled = false ;
+			c=true;				
+		}	
+
+		function reset(){                      // Starts from the time where it had been paused earlier
+			clearInterval(q);
+			getId("start1").disabled = false ;
+			c=false;
+			changeVal(sDays,sHrs,sMins,sSecs,smSec);
+			timer.addEvent(sDays,sHrs,sMins,sSecs,smSec);
+			show();		
+		}
+
+		function refresh() {                   // To set timer for  a different value
+			clearInterval(q);
+			changeVal(0,0,0,0,0);
+			getId("start1").disabled = false ;		
+			timer.addEvent(0,0,0,0,0);
+			show();		
+		}
+	</script>
+</body>
+</html>

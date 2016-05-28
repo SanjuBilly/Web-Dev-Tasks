@@ -1,0 +1,147 @@
+			body{
+	           background-color: rgb(20, 20, 20);
+        	}
+        	#hd{
+        		width: auto;
+        		height: 60px;
+        		text-align: center;
+        		color: white;
+        	}
+	       #container{
+			    width: 850px;	
+				height: 500px;
+				position: absolute;
+				margin-left: 150px;
+				background-color: lightgrey;
+				padding: 50px 50px 50px 50px ;
+				border-radius: 20px;
+			}
+			 #timer{
+				width: 850px;
+				height: 180px;
+				background-color: rgb(100,100,100);
+				border-radius: 40px;
+				
+			}
+			div .clock{
+			 	width: 55px;
+			 	height: 55px;
+			 	background-color: hsla(230,25%,25%,0.2);
+			 	text-align: center;
+			 	vertical-align: middle;
+			 	font-size: 35px;
+			 	color: white;
+			 	padding: 10px 10px 10px 10px;
+			 	margin: 30px;
+			 	margin-left: 60px;
+			 	border-radius: 20px;
+			 	float :left;
+		    }
+		    div .inputBox{
+		    	width: 550px;
+		    	height: 300px;
+		    	border: 2px solid black;
+		    }
+		    input {
+		    	width: 57px;
+		    	height: 30px;
+		    	border-radius: 10px;
+		    	text-align: center;
+		    	font-size: 20px;
+		    }
+		    input:focus {
+		    	width: 57px;
+		    	height: 30px;
+		    	border-radius: 10px;
+		    	background-color:#cccccc;
+		    	outline: none;
+		    	text-align: center;
+		    }
+		    input:hover {
+		    	width: 57px;
+		    	height: 30px;
+		    	border-radius: 10px;
+		    	background-color: lightgrey;
+		    }
+		    #day {
+		    	margin-left: 8px;
+		    }
+	        #d , #h , #m , #s{
+	        	float:left;
+	        	padding: 10px;
+	        }
+	        #dispText2{
+	        	width:340px;
+	        	height: 60px;
+	        	padding-left: 10px;
+	        }	        
+	        #dtD, #dtH, #dtM, #dtS {
+	        	padding: 10px;
+	        	margin: 7px;
+	        	float:left;
+	        	font-family: sans-serif;
+	        } 
+	        #dtS {
+	        	margin-left: -7px;
+	        }
+	        #buttons{
+	        	width: 300px;
+	        	height:400px;
+	        	padding-left: 15px;
+	        }
+	        .b:focus{
+	        	outline: none;
+	        }
+	        .b{
+	        	width: 60px;
+	        	height: 40px;
+	        	background-color: white ;
+	        	color : black;
+	        	border: none;
+	        	margin: 5px;
+	        	border-radius: 30%;
+	        	padding: 10px;
+	        	float: left;
+	        }
+	       .b:hover {
+	        	background-color: #555555;
+	        	width:25%;
+	        	height:11%;
+	        	color : white;
+	        	border: none;
+	        	border-radius: 30%;
+	        	padding: 10px;
+	        	transition-duration:0.2s;
+	        	-webkit-transition-duration:0.2s;
+	        }
+	        .b:disabled{
+	        	width: 60px;
+	        	height: 40px;
+	        	background-color: #222222 ;
+	        	color: #222222 ;
+	        	border: none;
+	        	margin: 5px;
+	        	border-radius: 30%;
+	        	padding: 10px;
+	        	float: left;
+	        }
+	        #dispText1{
+	        	width:850px;
+	        	height: 60px;
+	        	padding-left: 10px;
+	        }
+	       #dD, #dH, #dM, #dS ,#dmS{
+	       	   float :left;
+	       	   font-size: 25px;
+	       	   padding-left: 40px;
+	       	   margin-left: 20px;
+	       }    
+	       #dH{
+	       	margin-left: 71px;
+	       }
+	       #dS,#dM,#dmS{
+	       	padding-left: 63px;
+	       }
+	       #dM{
+	       	margin-left: 30px;
+	       }
