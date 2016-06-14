@@ -1,0 +1,151 @@
+<body>
+
+	<canvas width='620'></canvas>
+
+	<script>
+
+var canvas = document.querySelector("canvas");
+var	ctx = canvas.getContext("2d");
+var W = 350,H = 450 ;
+var obstacle = { speed :5 , cx :610 , cy : 30 , len: 10 , wid: 45 ,
+	addValue: function(spd,x,y,l,w){
+		this.speed=spd;
+		this.cx=x;
+		this.cy=y;
+		this.len=l;
+		this.wid=w;
+	},
+	draw: function(){
+		ctx.beginPath();
+		ctx.save();
+		ctx.rect(this.cx,this.cy,this.len,this.wid);
+		ctx.fillStyle = "brown";
+		ctx.fill();
+		ctx.restore();
+	},
+	update_coord: function(){
+		this.cx-=this.speed;
+	}};
+	var obs_gang = [];
+function rand_obj(){
+	var random = Math.floor(Math.random()*10)%3;
+	var o = Object.create(obstacle);
+	switch(random){
+		case 0 : {
+			o.addValue(5,610,30,25,45);
+			break;
+		}
+		case 1 : {
+			o.addValue(5,610,45,19,30);
+			break;
+		}
+		case 2 : {
+			o.addValue(5,610,55, 10,20);
+		}
+	}
+	obs_gang.push(o);
+}
+
+function draw_obs(){
+	for (var i=0; i<obs_gang.length ;i++) {
+		obs_gang[i].draw();
+		obs_gang[i].update_coord();
+		console.log(typeof(obs_gang[i]));
+	}
+}
+var s = setInterval(rand_obj,2000);
+var ball = {x: 30,yy: 65, radius: 10,color: "red",	vx: 0,	vy: 9, onGround : true, 
+	
+	draw: function() {
+		clearCanvas();
+		ctx.beginPath();
+		ctx.arc(this.x, this.yy, this.radius, 0, Math.PI*2, false);
+		ctx.fillStyle = this.color;
+		ctx.fill();
+		ctx.closePath();
+	} , 
+	update_coord: function(){
+     
+		this.yy -= this.vy;
+		console.log("POSITION", this.yy);
+		console.log("Velocity ",this.vy);
+		this.vy -= gravity;
+		if((this.vy<3)&&(first)||(this.yy<10)) {
+			this.vy *= -3;
+			first=false;
+		}
+
+		if(this.yy + this.radius >= 75){
+			this.yy = 65;
+			this.vy = 9;
+			this.onGround = true;
+		}
+	}
+}, gravity = 0.3,bounceFactor = 0;
+var isUpArrow =  false;
+var first = true,idk = true;
+
+addEventListener("keydown",function(e){
+	if(e.keyCode==38){
+		if((!isUpArrow)||(ball.onGround)) {
+			isUpArrow=true;
+			ball.onGround=false;
+			idk=false;
+			first= true;
+			jump();
+			console.log("jumping");
+		}
+	}
+});
+
+addEventListener("keyup", function(w){
+	if(w.keyCode==38){
+		isUpArrow=!isUpArrow;
+		idk = true;
+		move_obs();
+	}
+});
+
+function clearCanvas() {
+	ctx.clearRect(0, 0, canvas.width, canvas.height);
+}
+
+function jump(){
+	ball.draw();
+	if(!ball.onGround){
+		ball.update_coord();
+		window.requestAnimationFrame(jump);
+	}
+}
+
+function checkCollision(){
+  var x_sep , y_sep , cornerGap ;
+  x_sep = Math.abs(ball.x - obs_gang[0].cx);
+  y_sep = Math.abs(ball.yy - obs_gang[0].cy);
+  if(x_sep >(obs_gang[0].len)/2 + ball.radius)
+    return false ;
+  if(y_sep >(obs_gang[0].wid)/2 + ball.radius)
+   return false ; 
+  
+  if((x_sep<=(obs_gang[0].len)/2)||(y_sep<=(obs_gang[0].wid)/2))
+  	return true ;
+    
+  cornerGap = (x_sep - (obs_gang[0].len)/2)^2 + (y_sep - (obs_gang[0].wid)/2)^2 ;
+  
+  return (cornerGap <= (ball.radius)^2);
+  
+}
+
+function move_obs(){
+	
+	ball.draw();
+	draw_obs();
+  if(checkCollision())
+     
+	if(idk)
+	   reqId = requestAnimationFrame(move_obs);
+
+}
+//move_obs();
+	</script>
+</body>
