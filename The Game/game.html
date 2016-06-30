@@ -1,0 +1,467 @@
+<html>
+<head>
+	<title>https://www.google.com/ is not available</title>
+	<style type="text/css">
+		#container , #arena {
+			margin-top: 25px ;
+			margin-left: 190px ;
+		}
+		body {
+			background-color: #f7f7f7;
+		}
+
+		#addons {
+			visibility: hidden;
+		}
+	</style>
+</head>
+<body>
+	<div id = "container">
+		<div id = "arena">
+		<canvas id="cn"></canvas>
+		</div>
+		<div id="addons">
+    		<img id="sSheet" src="sheet/sprite.png">
+    	</div>
+    	<template id="audio-resources"> 
+    		<audio id="jump" src="sheet/press.mp3"></audio>
+    		<audio id="hit" src="sheet/hit.mp3"></audio>
+    		<audio id="reached" src="sheet/reached.mp3"></audio>
+    	</template>
+	</div>
+	<script type="text/javascript">
+	var canvas , ctx , press , hit , reached;
+
+	window.onload = function(){
+		gameDetails.timesPlayed=0;
+		gameDetails.stopDraw = false;
+		startListening();
+		canvas = document.getElementById("cn");
+		canvas.width = 600; canvas.height=250;
+		loadImage();
+		loadSounds();
+		loadGround();
+	    ctx = canvas.getContext("2d");
+	    start();
+		//ctx.drawImage(gameDetails.sprite,spritePos.trex.x,spritePos.trex.y,trex.width,trex.height,10,60,trex.width,trex.height);
+	}
+
+	function clearCanvas(){
+		ctx.clearRect(0,0,canvas.width,canvas.height);
+	}
+		var gameDetails = {
+			timesPlayed : 0 ,
+			keycodes :{
+				jump :{'38':0 , '32':0},
+				duck : {'40':0},
+				restart :{'13':0}
+			},
+			isStarted : false ,
+			firstGame : true ,
+			stopDraw : false
+
+		}; 
+		var spritePos = {
+			cactusLarge: {x: 332, y: 2},
+		    cactusSmall: {x: 228, y: 2},
+		    cloud: {x: 86, y: 2},
+		    horizon: {x: 2, y: 54},
+		    //crow: {x: 134, y: 2},
+		    restart: {x: 2, y: 2},
+		    gameOver: {x: 484, y: 15, width:190 , height:25},
+		    trex: {x: 677, y: 2}
+		};
+
+		var trex = { 
+			width:45, height:50,
+			sourceX:0 , sourceY:0 ,
+			xPos:10 , yPos:110 , 
+			reqId:0,rId:0,runId:0,duckId:0,
+			acceleration:0.8,speed:14,minJumpHeight:15,
+			animFrames: {
+			  idle: {
+			  	tickCount:0,
+			    curFrame:0,
+		    	frames: [44, 0],
+				msPerFrame: 100/3
+		      },
+			  run: {
+			  	tickCount:0,
+			  	curFrame:0,
+			    frames: [88, 132],
+			    msPerFrame: 100/12
+			  },
+			  dead: {
+			    frames: [220],
+			    msPerFrame: 1000 / 60
+			  },
+			  jump: {
+			  	tickCount:0,
+			    frames: [0],
+			    msPerFrame: 1
+			  },
+			  duck: {
+			  	tickCount:0,
+			  	curFrame:0,
+			    frames: [262, 321],
+			    msPerFrame: 100/ 8
+			  }
+			},
+
+			cancelAnimFrame : function(){
+				cancelAnimationFrame(this.reqId);
+				cancelAnimationFrame(this.rId);
+				cancelAnimationFrame(this.runId);
+				cancelAnimationFrame(this.duckId);
+				this.reqId = this.rId = this.runId = this.duckId =0;
+
+			},
+
+			updateRun : function(){
+				this.animFrames.run.tickCount++;
+				if(this.animFrames.run.tickCount>this.animFrames.run.msPerFrame){
+					this.animFrames.run.tickCount=0;
+					this.animFrames.run.curFrame =(this.animFrames.run.curFrame==1) ? 0 : 1 ;
+				}
+			},
+
+			startRunning : function(){
+				this.updateRun();
+				drawEverything();
+				this.runId=requestAnimationFrame(this.startRunning.bind(this));
+			},
+
+			updateDuck : function(){
+				this.animFrames.duck.tickCount++;
+				if(this.animFrames.duck.tickCount>this.animFrames.duck.msPerFrame){
+					this.animFrames.duck.tickCount=0;
+					this.animFrames.duck.curFrame =(this.animFrames.duck.curFrame==1) ? 0 : 1 ;
+				}
+			},
+
+			startDucking : function(){
+				if(!this.isDucking){
+					cancelAnimationFrame(this.duckId);
+					this.duckId=0;
+				}
+				else{
+					this.updateDuck();
+					drawEverything();
+					this.duckId=requestAnimationFrame(this.startDucking.bind(this));
+				}
+			},
+
+			disableRun : function(){
+				this.isRunning =false;
+				cancelAnimationFrame(this.runId);
+				this.runId=0;
+			},
+
+			updateJump : function(){
+				this.animFrames.jump.tickCount++;
+				if(this.animFrames.jump.tickCount>this.animFrames.jump.msPerFrame){
+					this.animFrames.jump.tickCount=0;
+					this.speed+=this.acceleration;
+					this.yPos-=this.speed;
+				}
+
+			},
+
+			  startJump : function(){
+			  	if((this.yPos<=this.minJumpHeight)||(this.speed<=0)){
+					cancelAnimationFrame(this.reqId);
+					this.reqId=0; this.speed = -15.4;
+					this.endJump();
+				}
+				else{
+					this.updateJump();
+			        drawEverything();
+					this.reqId=requestAnimationFrame(this.startJump.bind(this));
+				}
+			  	
+			  },
+			  endJump : function(){
+			  		if(this.yPos>=110){
+			  			cancelAnimationFrame(this.rId);
+			  			this.rId=0;
+			  			this.yPos = 114;
+			  			this.speed=10;
+			  			this.isJumping=false;
+			  			this.isRunning=true;
+			  			this.startRunning();
+			  		}
+			  		else{
+			  			this.updateJump();
+			  			drawEverything();
+				        this.rId=requestAnimationFrame(this.endJump.bind(this));
+		    		}
+
+			  },
+			
+			isJumping :false ,
+			isDucking :false ,
+			isRunning :false , 
+			isDead: false
+		};
+		var score = { };
+		var Obstacle = {
+			sourceX:0,sourceY:0,
+			width:0 , height:0 ,
+			xPos:0 , yPos: 0, speed:9,
+			addValue : function(sx,sy,w,h,x,y){
+				this.sourceX = sx;
+				this.sourceY = sy;
+				this.width = w;
+				this.height = h;
+				this.xPos = x;
+				this.yPos = y;
+			},
+			update : function(){
+				this.xPos -= this.speed;
+			}
+		};
+
+		var obstacles = [];
+		var minTimeGap = 1;
+
+		function addObstacle(){
+			var obst = Object.create(Obstacle);
+			var type = randomNum(1,6);
+			minTimeGap=0;
+			switch (type){
+				case 1 : {
+					obst.addValue(228,2,18,45,600,125);
+					break;
+				}
+				case 2 : {
+					obst.addValue(245,2,35,45,600,125);
+					break;
+				}
+				case 3 : {
+					obst.addValue(278,2,55,45,600,125);
+					break;
+				}
+				case 4 : {
+					obst.addValue(332,2,25,55,600,110);
+					minTimeGap=1;
+					break;
+				}
+				case 5 : {
+					obst.addValue(358,2,50,55,600,110);
+					minTimeGap=2;
+					break;
+				}
+				case 6 : {
+					obst.addValue(407,2,75,55,600,110);
+					minTimeGap=3;
+					break;
+				}
+			}
+			obstacles.push(obst);
+			minTimeGap+=randomNum(1,2);
+			e = setTimeout(addObstacle,minTimeGap*1000);		
+		}
+
+		function checkObstacle(){
+			if(obstacles.length>0)
+				if(obstacles[0].xPos<(-80))
+					obstacles.shift();
+		}
+
+		var cloud= {
+			xPos:620,yPos:0 , speed:1,
+			width:50, height:15,
+			updatePos : function(){
+				this.xPos-=this.speed;
+			}
+		 };
+
+		var clouds = [];
+		function randomNum(min,max){
+			return Math.floor(Math.random()*(max-min+1)+min);
+		}
+
+		var e , clds ;
+		function addCloud(){
+			if(gameDetails.isStarted){
+				var newCloud = Object.create(cloud);
+				newCloud.yPos = randomNum(20,90);
+				clouds.push(newCloud);
+				if(clouds[0].xPos<(-45)){
+					clouds.shift();
+				}
+			}
+			clds = setTimeout(addCloud,randomNum(1,4)*1000);
+		}
+
+		function updateClouds(){
+			for (var i=0; i<clouds.length; i++){
+				clouds[i].updatePos();
+			}
+		}
+		function initTimeout(){
+			 clds = setTimeout(addCloud,randomNum(2,4)*1000);
+			 e = setTimeout(addObstacle,minTimeGap*1000);
+		}
+
+		function endTimeout(){
+			console.log("Ended adding");
+			clearTimeout(clds);
+			clearTimeout(e);
+		}
+
+		var groundProps = {
+			xPos:0,yPos:145,speed:9,
+			width:310,height:15,sourceX:30,sourceY:51,
+			groundType : function(t){
+				this.sourceX = t==1 ? this.sourceX+=600 : this.sourceX ;
+			},
+			update : function(){
+				this.xPos-=this.speed;
+			}
+		};
+		var ground = [];
+
+		function loadImage(){
+			gameDetails.sprite = document.getElementById("sSheet");
+		}
+
+		function loadSounds(){
+			press = new Audio("sheet/press.mp3");
+			hit = new Audio("sheet/hit.mp3");
+			reached = new Audio("sheet/reached.mp3");
+		}
+
+		function loadGround(){			
+			createGround(0); createGround(1);
+			createGround(randomNum(0,1));
+		}
+
+		function checkGround(){
+			if(ground[0].xPos<-300)
+				ground.shift();
+			createGround(randomNum(0,1));
+		}
+
+		function createGround(type){
+			var grnd = Object.create(groundProps);
+			grnd.groundType(type);
+			grnd.xPos = 290*ground.length;
+			ground.push(grnd);
+		}
+
+		function playIntro(){
+			ctx.drawImage(gameDetails.sprite,45,2,trex.width,trex.height+5,trex.xPos,trex.yPos,trex.width,trex.height+5);
+		}
+
+		function startListening(){
+			document.addEventListener("keydown",function(e){
+				if((trex.isDead)||(!gameDetails.isStarted)) {
+					trex.isDead = false ;
+					console.log("HEY");
+					obstacles = []; clouds = [];
+					initTimeout();
+				}
+			
+			 if((!trex.isJumping)&&(e.keyCode in gameDetails.keycodes.jump)){
+			 	press.play();
+				trex.isJumping = true;
+				gameDetails.stopDraw = false;
+				trex.disableRun(); 
+				gameDetails.isStarted=true;
+				trex.startJump();
+				trex.isStarted=true;
+
+			}
+			else if((!trex.isJumping)&&(trex.isRunning)&&(e.keyCode in gameDetails.keycodes.duck)){
+				trex.disableRun();
+				console.log("down");
+				trex.isDucking=true;
+				trex.startDucking();
+			}
+			});
+			document.addEventListener("keyup",function(e){
+				if((e.keyCode in gameDetails.keycodes.duck)&&(!trex.isJumping)) {
+					trex.isDucking=false;
+					trex.isRunning=true;
+					trex.startRunning();
+				}
+			});
+		}
+
+		function stopListening(){
+			document.removeEventListener("keydown");
+			document.removeEventListener("keyup");
+		}
+
+		function pause(){
+			trex.cancelAnimFrame();
+			gameDetails.stopDraw= true;
+		}
+		function resume(){
+			gameDetails.stopDraw= false;
+		}
+
+		function checkForCollision(){
+			if(!(obstacles.length>0))
+				return 0;
+			return ((trex.xPos+5<obstacles[0].xPos+obstacles[0].width-5)&&(trex.xPos+trex.width-5>obstacles[0].xPos+5)&&(trex.yPos+5<obstacles[0].yPos+obstacles[0].height-5)&&(trex.height+trex.yPos-5>obstacles[0].yPos+5)) ;
+		}
+
+		function gameOverPanel(){
+			ctx.drawImage(gameDetails.sprite ,spritePos.gameOver.x,spritePos.gameOver.y,spritePos.gameOver.width,spritePos.gameOver.height,200,10,spritePos.gameOver.width,spritePos.gameOver.height);
+			console.log("hi"); 
+			ctx.drawImage(gameDetails.sprite,spritePos.trex.x,spritePos.trex.y,trex.width,trex.height,trex.xPos,trex.yPos,trex.width,trex.height);
+		}
+
+		function drawEverything(){
+			if(!gameDetails.stopDraw){
+					clearCanvas();
+					updateClouds();
+								
+					for(var i=0; i<clouds.length;i++){
+						ctx.drawImage(gameDetails.sprite,spritePos.cloud.x,spritePos.cloud.y,cloud.width,cloud.height,clouds[i].xPos,clouds[i].yPos,cloud.width,cloud.height);
+					}
+
+					if(checkForCollision()){
+						trex.isDead = true;
+						pause();
+						hit.play();
+						gameOverPanel();
+						endTimeout(); 
+					}
+					if(trex.isJumping)
+						ctx.drawImage(gameDetails.sprite,spritePos.trex.x,spritePos.trex.y,trex.width,trex.height,trex.xPos,trex.yPos,trex.width,trex.height);
+					else if(trex.isRunning)
+						ctx.drawImage(gameDetails.sprite,spritePos.trex.x+trex.animFrames.run.frames[trex.animFrames.run.curFrame],spritePos.trex.y,trex.width,trex.height,trex.xPos,trex.yPos,trex.width,trex.height);
+					else if(trex.isDucking)
+						ctx.drawImage(gameDetails.sprite,spritePos.trex.x+trex.animFrames.duck.frames[trex.animFrames.duck.curFrame],spritePos.trex.y,trex.height*1.2,trex.width,trex.xPos,trex.yPos,trex.height*1.2,trex.width);
+			
+					if(trex.isStarted){
+						for(var i=0 ; i<ground.length;i++){
+							ctx.drawImage(gameDetails.sprite,ground[i].sourceX,ground[i].sourceY,ground[i].width,ground[i].height,ground[i].xPos,ground[i].yPos,ground[i].width,ground[i].height);
+			
+							ground[i].update();
+						}
+						checkGround();
+		
+						for(var i=0;i<obstacles.length;i++){
+							ctx.drawImage(gameDetails.sprite,obstacles[i].sourceX,obstacles[i].sourceY,obstacles[i].width,obstacles[i].height,obstacles[i].xPos,obstacles[i].yPos,obstacles[i].width,obstacles[i].height);
+							obstacles[i].update();
+						}
+			
+						checkObstacle();
+					}
+			}
+		}
+
+		function start(){
+			if((!gameDetails.isStarted)) {
+				playIntro();
+			}
+			gameDetails.timesPlayed++;			
+		}
+		
+	</script>
+</body>
+</html>
