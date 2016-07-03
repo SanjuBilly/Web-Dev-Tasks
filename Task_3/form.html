@@ -1,0 +1,113 @@
+<html>
+<head>
+	<title>Welcome</title>
+	<link rel="stylesheet" type="text/css" href="form.css">
+</head>
+<body>
+	<div id="outerContainer">
+	<div id="signupContainer">
+    <legend><b>Sign Up </b></legend>
+	<form id="signup" action="signup.php" method="post" onsubmit="return validatee()" enctype="multipart/form-data">		
+			<div>
+				<label>Username </label>
+				<input type="text" id="uname" name="username" maxlength="20" pattern="[a-zA-Z0-9]{6,}" required/>
+			</div>		
+			<div>
+				<label>Password </label>
+				<input type="password" id="pass" name="pass" pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,20}" maxlength="20" required/>
+			</div>
+			<div>
+				<label>Confirm Password </label>
+				<input type="password" id="cpass" name="pass_conf" pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,20}" maxlength="20" required/>
+			</div>
+			<div>
+				<label>Profile pic </label>
+				<input type="file" accept="image/*" id="pic" name="prof_pic" required/>
+			</div>
+			<div>
+				<label>Email </label>
+				<input type="email" id="umail" name="usermail" pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,3}$" required/>
+			</div>
+			<div>
+				<button type="submit" name='signup' >Register</button>
+			</div>
+			<div id="error">
+
+			</div>
+	</form>
+	</div>
+	<div id ="loginContainer">
+		<legend><b>Log In</b></legend>
+		<form id="signin" action="login.php" method="post" enctype="multipart/form-data">
+			<div>
+				<label>Username or Email </label>
+				<input type="text" name="cred_uname" placeholder= "username or email id" required/>
+			</div>
+			<div>
+				<label>Password </label>
+				<input type="password" name="pass" placeholder=" password" required/>
+			</div>
+			<div>
+				<button type="submit">Login</button>
+			</div>
+		</form>
+	</div>
+</div>
+
+	<script type="text/javascript">
+		var un= document.getElementById("uname");
+		var pwd= document.getElementById("pass");
+		var cpwd= document.getElementById("cpass");
+		var mail= document.getElementById("umail");
+		var err= document.getElementById("error");
+
+		un.addEventListener("invalid",function(event){
+			event.preventDefault();
+			if(! event.target.validity.valid){
+				err.textContent = "Username should contain only a-z A-Z 0-9 and between 6-20 characters";
+				err.style.display = "block" ;
+			}
+		});
+
+		pwd.addEventListener("invalid",function(event){
+			event.preventDefault();
+			if(! event.target.validity.valid){
+				err.textContent = "Password should contain atleast one lowercase , one uppercase and one number and between 6-20 characters";
+				err.style.display = "block" ;
+			}
+		});
+
+		cpwd.addEventListener("invalid",function(event){
+			event.preventDefault();
+			if(! event.target.validity.valid){
+				err.textContent = "Password should contain atleast one lowercase , one uppercase and one number and between 6-20 characters";
+				err.style.display = "block" ;
+			}
+		});
+
+		mail.addEventListener("invalid",function(event){
+			event.preventDefault();
+			if(! event.target.validity.valid){
+				err.textContent = "Mail should be of the format example@xyz.com";
+				err.style.display = "block" ;
+			}
+		});
+
+	    function validatee(){
+			if(pwd.value!=cpwd.value){
+				err.textContent = "Passwords doesn't match !";
+				err.style.display = "block" ;
+				return false;
+			}
+
+			return true ;
+		}
+
+		document.addEventListener("input",function(event){
+			err.style.display = 'none';
+		});
+
+	</script>
+
+</body>
+</html>

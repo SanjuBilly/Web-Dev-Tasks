@@ -1,0 +1,24 @@
+<?php
+		require "connect.php";
+		$connect = mysqli_connect($host,$user,$password,$db) or die ("Error connecting to database".mysqli_error());
+
+		if(isset($_SESSION["active"])){
+			$name = $_SESSION["active"];			
+			$query = mysqli_query($connect,"SELECT * FROM details WHERE uname = '".$name."' OR email = '".$name."'");
+			$row  = mysqli_fetch_array($query);
+			$name = $row['uname'];
+			$mail = $row['email'];
+
+			echo "Welcome , ".$name."!";
+			echo "Email id - ".$mail;
+			echo "Coming here??";
+			
+		}
+		else{
+			header("location:form.html");
+		}
+?>
+		<a href="logout.php">Log Out</a>
+<?php
+		mysqli_close($connect);
+?>
