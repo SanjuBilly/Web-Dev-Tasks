@@ -25,7 +25,7 @@
 	<a href="logout.php" >Log Out</a>
 	<div>User Name - <?php echo $name ; ?></div>
 	<div>Email id - <?php echo $mail ; ?></div>
-	<div><img scr="<?php echo $img ; ?>" width="400" height="300" /> </div>
+	<div><?php echo '<img src="'.$img.'"/>'; ?></div>
 
 </body>
 </html>
