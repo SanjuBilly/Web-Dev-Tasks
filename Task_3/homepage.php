@@ -22,10 +22,15 @@
 		mysqli_close($connect);
 ?>
 <body>
-	<a href="logout.php" >Log Out</a>
-	<div>User Name - <?php echo $name ; ?></div>
-	<div>Email id - <?php echo $mail ; ?></div>
-	<div><?php echo '<img src="'.$img.'"/>'; ?></div>
+<div id="top">
+	<button id="out" onclick="logout.php">Log Out</button>
+</div>
+<div id="details">
+	<div id="hpimg"><?php echo '<img src="'.$img.'"/>'; ?></div>
+	<div id="hp">User Name - <?php echo $name ; ?></div>
+	<div id="hp">Email id  - <?php echo $mail ; ?></div>
+</div>
+	
 
 </body>
 </html>
