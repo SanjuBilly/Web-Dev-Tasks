@@ -19,6 +19,10 @@ label {
 
 button {
 	margin-left: 145px;
+	width: 70px;
+	height : 23px;
+	background-color: rgb(88, 96, 83);
+	color: white;
 }
 
 div {
@@ -27,13 +31,50 @@ div {
 
 #error {
 	display: block ;
-	background-color: lightgrey;
 	margin-left: 145px;
 	width : 170px;
 	height: 80px;
 }
 
-input:focus {
-	border : 2px solid green ;
+input {
+	border: none;
+	border-left: 2px solid lightblue ;
+	border-bottom: 2px solid lightblue ;
+	background-color: #f2f2f2;
+
 }
 
+input:focus {
+	border: none;
+	border-left: 2px solid lightgreen ;
+	border-bottom: 2px solid lightgreen ;
+	outline: none;
+}
+
+#hpimg {
+	width: 100px ;
+	height: 130px;
+	background-color:rgb(185, 200, 187);
+}
+
+#hp {
+	width : 160px;
+	height: 40px;
+	margin-top: 10px;
+	background-color: #d2d2d2 ;
+}
+
+#out {
+	float: right ;
+}
+
+#details {
+	margin-left: 200px;
+	margin-top: 50px;
+}
+
+#top {
+	width : 1200px;
+	height: 30px;
+	background-color: rgb(88, 96, 139);
+}
