@@ -59,7 +59,7 @@
 					<?php
 				}
 				else {
-					$img_file = $_FILES["prof_pic"]["tmp_name"];
+					$img_file = addslashes(file_get_contents($_FILES["prof_pic"]["tmp_name"]));
 					$query = mysqli_query($connect,"INSERT INTO details (uname,password,email,image,img) VALUES ('$u_name','$passwd','$mail','$file','$img_file')");
 					move_uploaded_file($_FILES["prof_pic"]["tmp_name"],$file);
 					echo "Registration complete!!" ;
