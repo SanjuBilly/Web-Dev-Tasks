@@ -18,15 +18,14 @@
 		else{
 			header("location:form.html");
 		}
-
 		mysqli_close($connect);
 ?>
 <body>
 <div id="top">
-	<button id="out" onclick="logout.php">Log Out</button>
+	<button id="out" onclick="location.href='logout.php' ">Log Out</button>
 </div>
 <div id="details">
-	<div id="hpimg"><?php echo '<img src="'.$img.'"/>'; ?></div>
+	<div id="hpimg"><?php echo '<img src="data:image/jpeg;base64,'.base64_encode( $row['img'] ).'" width="100" height="130"/>'; ?></div>
 	<div id="hp">User Name - <?php echo $name ; ?></div>
 	<div id="hp">Email id  - <?php echo $mail ; ?></div>
 </div>
